@@ -3,6 +3,7 @@ const router = express.Router();
 const projectController = require("../controllers/projectController");
 const typeController = require("../controllers/typeController");
 const { authenticateJWT } = require("../middleware/auth");
+const cardController = require("../controllers/cardController");
 
 router.use(authenticateJWT);
 // Project routes
@@ -16,6 +17,9 @@ router.post("/:projectId/types/create", typeController.createType);
 router.delete("/:projectId/types/:typeId", typeController.deleteType);
 router.put("/:projectId/types/:typeId", typeController.updateType);
 
-
+// Card routes
+router.post("/:projectId/cards/create", cardController.createCard);
+router.delete("/:projectId/cards/:cardId", cardController.deleteCard);
+router.put("/:projectId/cards/:cardId", cardController.updateCard);
 
 module.exports = router;
