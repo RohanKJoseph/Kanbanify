@@ -72,6 +72,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const createAxiosInstance = () => {
+    const instance = axios.create({
+      baseURL: API_BASE_URL
+    });
+    
+    instance.interceptors.request.use(
+      (config) => {
+        if (accessToken) {
+          config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+
+    return instance;
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       setAuthLoading(true);
@@ -104,6 +124,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         loginUser,
         signupUser,
+        axiosPrivate: createAxiosInstance(),
       }}
     >
       {!authLoading && children}
