@@ -1,4 +1,14 @@
-const app = require('./src/app');
+const express = require("express");
+const routes = require("./routes");
+const app = express();
+
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.json({ message: "Kanbanify backend" });
+});
+
+app.use(routes);
 
 const PORT = process.env.PORT || 5000;
 
