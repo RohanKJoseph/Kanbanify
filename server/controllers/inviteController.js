@@ -18,6 +18,19 @@ class InviteController {
         await deleteInviteFromDB(projectId, userId);
         res.status(200).json(invite);
     }
+
+    getInvites = async (req, res) => {
+        const userId = req.user.id;
+        const invites = await getInvitesFromDB(userId);
+        res.status(200).json(invites);
+    }
+
+    declineInvite = async (req, res) => {
+        const { projectId } = req.params;
+        const userId = req.user.id;
+        await deleteInviteFromDB(projectId, userId);
+        res.status(200).json({ message: "Invite declined" });
+    }
 }
 
 module.exports = new InviteController();

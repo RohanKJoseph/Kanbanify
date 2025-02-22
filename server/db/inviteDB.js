@@ -21,4 +21,12 @@ const deleteInviteFromDB = async (projectId, userId) => {
   });
 };
 
-module.exports = { addInviteToDB, deleteInviteFromDB };
+const getInvitesFromDB = async (userId) => {
+  return await prisma.invite.findMany({
+    where: {
+      userId: userId
+    }
+  });
+};
+
+module.exports = { addInviteToDB, deleteInviteFromDB, getInvitesFromDB };
