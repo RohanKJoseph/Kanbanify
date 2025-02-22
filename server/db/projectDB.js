@@ -14,10 +14,11 @@ const addProjectToDB = async (name, description, userId) => {
     });
 
     await Promise.all(
-      defaultTypes.map((typeName) =>
+      defaultTypes.map((type) =>
         tx.type.create({
           data: {
-            name: typeName,
+            name: type.name,
+            position: type.position,
             projectId: project.id,
           },
         })
