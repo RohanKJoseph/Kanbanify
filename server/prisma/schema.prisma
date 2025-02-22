@@ -38,6 +38,7 @@ model RefreshToken {
 model Project {
   id        String   @id @default(uuid())
   name      String   @db.VarChar(255)
+  description String?   @db.Text
   ownerId   String
   invites   Invite[]
   user      User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
