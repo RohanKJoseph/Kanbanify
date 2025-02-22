@@ -26,7 +26,10 @@ const addProjectToDB = async (name, description, userId) => {
 };
 
 const getProjectsFromDB = async (userId) => {
-  return await prisma.project.findMany({ where: { ownerId: userId } });
+  return await prisma.project.findMany({
+    where: { ownerId: userId },
+    include: { user: true},
+  });
 };
 
 const getProjectFromDBById = async (projectId) => {
@@ -34,6 +37,8 @@ const getProjectFromDBById = async (projectId) => {
     where: { id: projectId },
     include: {
       cards: true,
+      user: true,
+      types: true,
     },
   });
 };
