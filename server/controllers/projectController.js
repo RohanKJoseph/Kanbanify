@@ -3,6 +3,7 @@ const {
   getProjectsFromDB,
   getProjectFromDBById,
   deleteProjectFromDB,
+  updateProjectInDB
 } = require("../db/projectDB");
 
 class ProjectController {
@@ -15,8 +16,8 @@ class ProjectController {
           .json({ error: "Name and description are required" });
       }
       const userId = req.user.id;
-      await addProjectToDB(name, description, userId);
-      res.status(200).json({ message: "Project created successfully" });
+      const project = await addProjectToDB(name, description, userId);
+      res.status(200).json({ message: "Project created successfully", project });
     } catch (error) {
       res
         .status(500)
@@ -93,6 +94,18 @@ class ProjectController {
       res
         .status(500)
         .json({ error: `Error getting project: ${error.message}` });
+    }
+  };
+
+  updateProject = async (req, res) => {
+    try {
+      const projectId = req.params.projectId;
+      const { name, description } = req.body;
+      const userId = req.user.id;
+      const project = await updateProjectInDB(projectId, name, description, userId);
+      res.status(200).json({ message: "Project updated successfully", project });
+    } catch (error) {
+      res.status(500).json({ error: `Error updating project: ${error.message}` });
     }
   };
 

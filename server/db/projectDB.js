@@ -3,7 +3,8 @@ const { defaultTypes } = require("../config/project");
 
 const addProjectToDB = async (name, description, userId) => {
   // while creating a project, create default types for the project as well
-  await prisma.$transaction(async (tx) => {
+  
+  return await prisma.$transaction(async (tx) => {
     const project = await tx.project.create({
       data: {
         name,
@@ -22,6 +23,8 @@ const addProjectToDB = async (name, description, userId) => {
         })
       )
     );
+
+    return project;
   });
 };
 
@@ -43,6 +46,13 @@ const getProjectFromDBById = async (projectId) => {
   });
 };
 
+const updateProjectInDB = async (projectId, name, description, userId) => {
+  return await prisma.project.update({
+    where: { id: projectId, ownerId: userId },
+    data: { name, description },
+  });
+};
+
 const deleteProjectFromDB = async (projectId) => {
   return await prisma.project.delete({ where: { id: projectId } });
 };
@@ -60,4 +70,5 @@ module.exports = {
   getProjectFromDBById,
   deleteProjectFromDB,
   addMemberToProject,
+  updateProjectInDB
 };

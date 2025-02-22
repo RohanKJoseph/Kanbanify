@@ -12,6 +12,7 @@ router.get("/", projectController.getProjects);
 router.post("/create", projectController.createProject);
 router.get("/:projectId", projectController.getProjectById);
 router.delete("/:projectId", projectController.deleteProject);
+router.put("/:projectId", projectController.updateProject);
 
 // Type routes
 router.post("/:projectId/types/create", typeController.createType);
