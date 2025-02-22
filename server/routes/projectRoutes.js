@@ -26,6 +26,7 @@ router.put("/:projectId/cards/:cardId", cardController.updateCard);
 //invite routes
 router.post("/:projectId/invite", inviteController.inviteUser);     
 router.put("/:projectId/accept-invite", inviteController.acceptInvite);        
-// router.post("/:projectId/decline-invite", inviteController.declineInvite);
+router.post("/:projectId/decline-invite", inviteController.declineInvite);
+router.get("/invites", inviteController.getInvites);
 
 module.exports = router;
