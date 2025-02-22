@@ -33,8 +33,8 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);
       return true;
     } catch (error) {
-      setIsAuthenticated(false); 
-      return false
+      setIsAuthenticated(false);
+      return false;
     }
   };
 
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
     setAccessToken(null);
     setRefreshToken(null);
     localStorage.removeItem("refreshToken");
-    isAuthenticated(false);
+    setIsAuthenticated(false);
   };
 
   const refreshAccessToken = async () => {
@@ -73,13 +73,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    setAuthLoading(true);
-    const storedRefreshToken = localStorage.getItem("refreshToken");
-    if (storedRefreshToken) {
-      setRefreshToken(storedRefreshToken);
-      refreshAccessToken();
-    }
-    setAuthLoading(false);
+    const initializeAuth = async () => {
+      setAuthLoading(true);
+      const storedRefreshToken = localStorage.getItem("refreshToken");
+      if (storedRefreshToken) {
+        setRefreshToken(storedRefreshToken);
+        await refreshAccessToken();
+      }
+      setAuthLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   useEffect(() => {
@@ -102,7 +106,7 @@ export const AuthProvider = ({ children }) => {
         signupUser,
       }}
     >
-      {children}
+      {!authLoading && children}
     </AuthContext.Provider>
   );
 };
