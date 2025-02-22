@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Type" ADD COLUMN     "position" INTEGER NOT NULL DEFAULT 0;
