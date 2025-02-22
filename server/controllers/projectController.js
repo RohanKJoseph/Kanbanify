@@ -65,7 +65,7 @@ class ProjectController {
           type: {
             id: type.id,
             name: type.name,
-            color: type.color
+            position: type.position,
           }
         };
       });
