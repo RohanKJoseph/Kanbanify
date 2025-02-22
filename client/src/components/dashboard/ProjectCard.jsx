@@ -12,38 +12,74 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { LoadingButton } from "@/components/ui/loading-button";
 
-const ProjectCard = ({ project }) => {
+const ProjectCard = ({ project, setProjects, projects }) => {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [updatedProject, setUpdatedProject] = useState({
     name: project.name,
     description: project.description,
   });
+  const { axiosPrivate } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedProject({ ...updatedProject, [name]: value });
   };
 
-  const handleUpdateProject = () => {
-    console.log("Updating project:", updatedProject);
-    // Add logic to update the project
+  const handleUpdateProject = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const response = await axiosPrivate.put(
+        `/project/${project.id}`,
+        updatedProject
+      );
+      if (response.data.error) {
+        toast.error(response.data.error);
+      } else {
+        toast.success("Project updated successfully");
+        setProjects(
+          projects.map((p) =>
+            p.id === project.id ? { ...p, ...updatedProject } : p
+          )
+        );
+      }
+    } catch (error) {
+      toast.error("Error updating project");
+      return;
+    }
     setIsUpdateDialogOpen(false);
+    setIsSubmitting(false);
+  };
+
+  const handleDeleteProject = async () => {
+    try {
+      setProjects(projects.filter((p) => p.id !== project.id));
+      const response = await axiosPrivate.delete(
+        `/project/${project.id}`
+      );
+      if (response.data.error) {
+        toast.error(response.data.error);
+      } else {
+        toast.success("Project deleted successfully");
+      }
+    } catch (error) {
+      toast.error("Error deleting project");
+      return;
+    }
   };
 
   return (
@@ -64,7 +100,7 @@ const ProjectCard = ({ project }) => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-red-500 hover:bg-red-500 hover:text-[#fff]"
-                onClick={() => console.log("Delete")}
+                onClick={() => handleDeleteProject(project.id)}
               >
                 Delete
               </DropdownMenuItem>
@@ -106,9 +142,9 @@ const ProjectCard = ({ project }) => {
               onChange={handleInputChange}
               className="border p-2 rounded"
             />
-            <DialogClose asChild>
-              <Button onClick={handleUpdateProject}>Update</Button>
-            </DialogClose>
+            <LoadingButton onClick={handleUpdateProject} loading={isSubmitting}>
+              Update
+            </LoadingButton>
           </form>
         </DialogContent>
       </Dialog>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectCard from "../components/dashboard/ProjectCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,59 +11,15 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-
-const projects = [
-  {
-    id: 1,
-    name: "Project 1",
-    description: "Description for project 1",
-    createdAt: "2023-01-01",
-  },
-  {
-    id: 2,
-    name: "Project 2",
-    description: "Description for project 2",
-    createdAt: "2023-02-01",
-  },
-  {
-    id: 3,
-    name: "Project 3",
-    description: "Description for project 3",
-    createdAt: "2023-03-01",
-  },
-  {
-    id: 4,
-    name: "Project 4",
-    description: "Description for project 4",
-    createdAt: "2023-04-01",
-  },
-  {
-    id: 5,
-    name: "Project 5",
-    description: "Description for project 5",
-    createdAt: "2023-05-01",
-  },
-  {
-    id: 6,
-    name: "Project 6",
-    description: "Description for project 6",
-    createdAt: "2023-06-01",
-  },
-  {
-    id: 7,
-    name: "Project 7",
-    description: "Description for project 7",
-    createdAt: "2023-07-01",
-  },
-  {
-    id: 8,
-    name: "Project 8",
-    description: "Description for project 8",
-    createdAt: "2023-08-01",
-  },
-];
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { LoadingButton } from "@/components/ui/loading-button";
 
 const DashBoard = () => {
+  const { axiosPrivate } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [open, setOpen] = useState(false);
   const [newProject, setNewProject] = useState({ name: "", description: "" });
 
   const handleInputChange = (e) => {
@@ -71,14 +27,49 @@ const DashBoard = () => {
     setNewProject({ ...newProject, [name]: value });
   };
 
-  const handleCreateProject = () => {
-    console.log("Creating project:", newProject);
-    // Add logic to create the project
+  const fetchProjects = async () => {
+    try {
+      const response = await axiosPrivate.get("/project");
+      console.log(response.data);
+      setProjects(response.data?.projects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      toast.error("Error fetching projects");
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const handleCreateProject = async () => {
+    setIsSubmitting(true);
+    try {
+      const response = await axiosPrivate.post("/project/create", newProject);
+      if (response.data.error) {
+        toast.error(response.data.error);
+        setIsSubmitting(false);
+      } else {
+        setProjects([...projects, response.data.project]);
+        toast.success("Project created successfully");
+        setIsSubmitting(false);
+        setOpen(false);
+      }
+    } catch (error) {
+      toast.error("Error creating project");
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-[50px]">
-      <Dialog onOpenChange={() => setNewProject({ name: "", description: "" })}>
+      <Dialog
+        open={open}
+        onOpenChange={() => {
+          setOpen(!open);
+          setNewProject({ name: "", description: "" });
+        }}
+      >
         <DialogTrigger asChild>
           <Card className="border-dashed border-2 border-[#afafaf] flex justify-center items-center bg-[#3d7afd]/[0.10] cursor-pointer">
             <CardContent>
@@ -110,15 +101,21 @@ const DashBoard = () => {
               onChange={handleInputChange}
               className="border p-2 rounded"
             />
-            <DialogClose asChild>
-              <Button onClick={handleCreateProject}>Create</Button>
-            </DialogClose>
+            <LoadingButton onClick={handleCreateProject} loading={isSubmitting}>
+              Create
+            </LoadingButton>
           </form>
         </DialogContent>
       </Dialog>
-      {projects.map((project) => (
-        <ProjectCard key={project.id} project={project} />
-      ))}
+      {projects &&
+        projects.map((project) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            setProjects={setProjects}
+            projects={projects}
+          />
+        ))}
     </div>
   );
 };
