@@ -19,6 +19,7 @@ model User {
   invites       Invite[]
   profileUrl    String    @db.VarChar(2048)
   createdAt     DateTime  @default(now())
+  memberOf      Project[] @relation("ProjectMembers")  
   
   @@index([email])
 }
@@ -36,16 +37,17 @@ model RefreshToken {
 }
 
 model Project {
-  id        String   @id @default(uuid())
-  name      String   @db.VarChar(255)
-  description String?   @db.Text
-  ownerId   String
-  invites   Invite[]
-  user      User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  cards     Card[]
-  types     Type[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  ownerId     String
+  invites     Invite[]
+  user        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  cards       Card[]
+  types       Type[]
+  members     User[]   @relation("ProjectMembers")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
 
   @@index([ownerId])
 }
