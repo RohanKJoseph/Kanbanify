@@ -4,7 +4,7 @@ const {
   verifyRefreshToken,
 } = require("../utils/jwt");
 
-const { getRefreshTokenToDB, addRefreshTokenToDB } = require("../db/userDB");
+const { getRefreshTokenFromDB, addRefreshTokenToDB } = require("../db/userDB");
 
 class AuthService {
   createRefreshToken = async (userId, keepLoggedIn = false) => {
@@ -18,7 +18,7 @@ class AuthService {
 
   refreshAccessToken = async (refreshToken) => {
     const payload = verifyRefreshToken(refreshToken);
-    const savedToken = await getRefreshTokenToDB();
+    const savedToken = await getRefreshTokenFromDB(payload, refreshToken);
     if (!savedToken) {
       throw new Error("Invalid refresh token");
     }

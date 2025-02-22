@@ -27,7 +27,7 @@ const addRefreshTokenToDB = async (userId, refreshToken, expiresAt) => {
   });
 };
 
-const getRefreshTokenToDB = async () => {
+const getRefreshTokenFromDB = async (payload, refreshToken) => {
   return await prisma.refreshToken.findFirst({
     where: {
       token: refreshToken,
@@ -47,7 +47,7 @@ const updateUserDataInDB = async (where, data) => {
 module.exports = {
   getUserFromDB,
   addRefreshTokenToDB,
-  getRefreshTokenToDB,
+  getRefreshTokenFromDB,
   addUserToDB,
   updateUserDataInDB
 };
