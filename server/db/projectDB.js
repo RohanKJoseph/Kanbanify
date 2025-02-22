@@ -28,7 +28,7 @@ const addProjectToDB = async (name, description, userId) => {
 const getProjectsFromDB = async (userId) => {
   return await prisma.project.findMany({
     where: { ownerId: userId },
-    include: { user: true},
+    include: { user: true },
   });
 };
 
@@ -47,9 +47,17 @@ const deleteProjectFromDB = async (projectId) => {
   return await prisma.project.delete({ where: { id: projectId } });
 };
 
+const addMemberToProject = async (projectId, userId) => {
+  return await prisma.project.update({
+    where: { id: projectId },
+    data: { members: { connect: { id: userId } } },
+  });
+};
+
 module.exports = {
   addProjectToDB,
   getProjectsFromDB,
   getProjectFromDBById,
   deleteProjectFromDB,
+  addMemberToProject,
 };
