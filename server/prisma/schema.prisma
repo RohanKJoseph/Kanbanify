@@ -8,20 +8,82 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(uuid())
-  name        String?
-  email       String    @unique
-  password    String
+  id            String    @id @default(uuid())
+  name          String?   @db.VarChar(255)
+  email         String    @unique @db.VarChar(255)
+  password      String
   refreshTokens RefreshToken[]
-  profileUrl  String
-  createdAt   DateTime  @default(now())
+  projects      Project[]
+  comments      Comment[]
+  assignedCards Card[]    @relation("CardToUser")
+  invites       Invite[]
+  profileUrl    String    @db.VarChar(2048)
+  createdAt     DateTime  @default(now())
+  
+  @@index([email])
 }
 
 model RefreshToken {
   id        String   @id @default(uuid())
   token     String   @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Project {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(255)
+  ownerId   String
+  invites   Invite[]
+  user      User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  cards     Card[]
+  type      String[]
+  createdAt DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+model Card {
+  id          String    @id @default(uuid())
+  title       String    @db.VarChar(255)
+  description String?   @db.Text
+  priority    String?   @db.VarChar(50)
+  type        String    @db.VarChar(100)
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assigned    User[]    @relation("CardToUser")
+  comments    Comment[]
+  createdAt   DateTime  @default(now())
+
+  @@index([projectId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  cardId    String
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@index([userId])
+}
+
+model Invite {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([projectId])
 }
