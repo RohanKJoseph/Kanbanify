@@ -59,6 +59,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const signupUser = async (name, email, password) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/signup`, {
+        name,
+        email,
+        password,
+      });
+    } catch (error) {
+      console.error("Error signing up:", error);
+      return false;
+    }
+  };
+
   useEffect(() => {
     setAuthLoading(true);
     const storedRefreshToken = localStorage.getItem("refreshToken");
@@ -85,7 +98,8 @@ export const AuthProvider = ({ children }) => {
         logout,
         authLoading,
         isAuthenticated,
-        loginUser
+        loginUser,
+        signupUser,
       }}
     >
       {children}

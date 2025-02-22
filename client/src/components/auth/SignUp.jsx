@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -9,8 +9,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignUp = () => {
+  const { signupUser } = useAuth();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    await signupUser(name, email, password);
+  };
+
   return (
     <div className="signup-container flex justify-center items-center">
       <Card className="max-w-md mx-auto min-w-[400px]">
@@ -24,6 +35,8 @@ const SignUp = () => {
                   type="text"
                   placeholder="Name"
                   autoComplete="off"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
@@ -33,6 +46,8 @@ const SignUp = () => {
                   type="email"
                   placeholder="Email"
                   autoComplete="off"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
@@ -42,13 +57,17 @@ const SignUp = () => {
                   type="password"
                   placeholder="Password"
                   autoComplete="off"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
           </form>
         </CardContent>
         <CardFooter>
-          <Button type="submit">Sign Up</Button>
+          <Button type="submit" onClick={handleSignup}>
+            Sign Up
+          </Button>
         </CardFooter>
       </Card>
     </div>

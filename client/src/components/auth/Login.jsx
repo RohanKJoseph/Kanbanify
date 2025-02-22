@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -9,8 +9,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
+  const { loginUser } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    await loginUser(email, password);
+  };
   return (
     <div className="login-container flex justify-center items-center">
       <Card className="max-w-md mx-auto min-w-[400px]">
@@ -24,6 +33,8 @@ const Login = () => {
                   type="email"
                   placeholder="Email"
                   autoComplete="off"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
@@ -33,13 +44,17 @@ const Login = () => {
                   type="password"
                   placeholder="Password"
                   autoComplete="off"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
           </form>
         </CardContent>
         <CardFooter>
-          <Button type="submit">Login</Button>
+          <Button type="submit" onClick={handleLogin}>
+            Login
+          </Button>
         </CardFooter>
       </Card>
     </div>
