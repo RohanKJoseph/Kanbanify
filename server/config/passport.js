@@ -42,13 +42,14 @@ passport.use(
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: JWT_SECRET,
     },
-    async (payload, data) => {
+    async (payload, done) => {
       try {
         const user = await getUserFromDB({ id: payload.sub });
 
         if (!user) {
           return done(null, false, { message: "User not found" });
         }
+        return done(null, user);
       } catch (error) {
         console.log(error);
         return done(null, false, { error: error });
