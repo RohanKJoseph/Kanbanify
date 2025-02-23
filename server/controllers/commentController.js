@@ -16,7 +16,8 @@ class CommentController {
   createComment = async (req, res) => {
     const { content } = req.body;
     const cardId = req.params.cardId;
-    const comment = await createCommentToDB(content, cardId);
+    const userId = req.user.id;
+    const comment = await createCommentToDB(content, cardId, userId);
     res.status(200).json({ message: "Comment created successfully", comment });
   };
 
