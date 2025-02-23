@@ -67,7 +67,7 @@ function Project() {
   const handleAddTaskType = async () => {
     try {
       const response = await axiosPrivate.post(
-        `${API_BASE_URL}/project/${projectId}/types`,
+        `${API_BASE_URL}/project/${projectId}/types/create`,
         {
           name: newTaskType,
         }
@@ -90,7 +90,7 @@ function Project() {
   const handleAddTask = async () => {
     try {
       const response = await axiosPrivate.post(
-        `${API_BASE_URL}/project/${projectId}/cards`,
+        `${API_BASE_URL}/project/${projectId}/cards/create`,
         {
           title: newTaskTitle,
           description: newTaskDescription,
@@ -117,10 +117,14 @@ function Project() {
 
   const handleMoveTask = async (taskId, destinationTypeId, sourceTypeId) => {
     try {
-      const cardToMove = project.cards[sourceTypeId].cards.find((card) => card.id === taskId);
+      const cardToMove = project.cards[sourceTypeId].cards.find(
+        (card) => card.id === taskId
+      );
       if (cardToMove) {
         // Update the local state immediately
-        const updatedCards = project.cards[sourceTypeId].cards.filter((card) => card.id !== taskId);
+        const updatedCards = project.cards[sourceTypeId].cards.filter(
+          (card) => card.id !== taskId
+        );
         setProject((prev) => ({
           ...prev,
           cards: {
@@ -131,18 +135,24 @@ function Project() {
             },
             [destinationTypeId]: {
               ...prev.cards[destinationTypeId],
-              cards: [...prev.cards[destinationTypeId].cards, { ...cardToMove, typeId: destinationTypeId }],
+              cards: [
+                ...prev.cards[destinationTypeId].cards,
+                { ...cardToMove, typeId: destinationTypeId },
+              ],
             },
           },
         }));
 
         // Attempt to update on the server
         try {
-          await axiosPrivate.put(`${API_BASE_URL}/project/${projectId}/cards/${taskId}`, {
-            title: cardToMove.title,
-            description: cardToMove.description,
-            typeId: destinationTypeId,
-          });
+          await axiosPrivate.put(
+            `${API_BASE_URL}/project/${projectId}/cards/${taskId}`,
+            {
+              title: cardToMove.title,
+              description: cardToMove.description,
+              typeId: destinationTypeId,
+            }
+          );
         } catch (error) {
           // If the server update fails, revert the local state
           setProject((prev) => ({
@@ -155,7 +165,9 @@ function Project() {
               },
               [destinationTypeId]: {
                 ...prev.cards[destinationTypeId],
-                cards: prev.cards[destinationTypeId].cards.filter((card) => card.id !== taskId),
+                cards: prev.cards[destinationTypeId].cards.filter(
+                  (card) => card.id !== taskId
+                ),
               },
             },
           }));
@@ -174,9 +186,7 @@ function Project() {
 
     if (!destination) return;
 
-    if (
-      destination.droppableId === source.droppableId 
-    ) {
+    if (destination.droppableId === source.droppableId) {
       console.log("same type");
       // Update content if moving within the same type
       const updatedCards = project.cards[source.droppableId].cards;
@@ -245,7 +255,7 @@ function Project() {
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                             >
-                              <TaskCard card={card} projectId={projectId} />
+                              <TaskCard card={card} projectId={projectId} setProject={setProject} />
                             </div>
                           )}
                         </Draggable>
