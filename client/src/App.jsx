@@ -6,6 +6,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import DashBoard from "./pages/DashBoard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "@/components/ui/sonner";
+import Project from "./pages/Project";
 
 function App() {
   return (
@@ -20,6 +21,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DashBoard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/:projectId"
+              element={
+                <ProtectedRoute>
+                  <Project />
                 </ProtectedRoute>
               }
             />

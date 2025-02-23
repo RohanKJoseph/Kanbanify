@@ -14,6 +14,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { LoadingButton } from "@/components/ui/loading-button";
+import { useNavigate } from "react-router-dom";
 
 const DashBoard = () => {
   const { axiosPrivate } = useAuth();
@@ -21,6 +22,7 @@ const DashBoard = () => {
   const [projects, setProjects] = useState([]);
   const [open, setOpen] = useState(false);
   const [newProject, setNewProject] = useState({ name: "", description: "" });
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -71,7 +73,7 @@ const DashBoard = () => {
         }}
       >
         <DialogTrigger asChild>
-          <Card className="border-dashed border-2 border-[#afafaf] flex justify-center items-center bg-zinc-500/[0.13] cursor-pointer">
+          <Card className="border-dashed border-2 border-[#afafaf] flex justify-center items-center bg-zinc-500/[.13] cursor-pointer">
             <CardContent>
               <h1 className="opacity-100">Create New Project</h1>
             </CardContent>
@@ -109,12 +111,20 @@ const DashBoard = () => {
       </Dialog>
       {projects &&
         projects.map((project) => (
-          <ProjectCard
+          <div 
+            onClick={() => {
+              console.log(project.id);
+              navigate(`/${project.id}`);
+            }} 
             key={project.id}
-            project={project}
-            setProjects={setProjects}
-            projects={projects}
-          />
+          >
+            <ProjectCard
+              key={project.id}
+              project={project}
+              setProjects={setProjects}
+              projects={projects}
+            />
+          </div>
         ))}
     </div>
   );

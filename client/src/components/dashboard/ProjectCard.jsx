@@ -81,7 +81,7 @@ const ProjectCard = ({ project, setProjects, projects }) => {
   };
 
   return (
-    <Card className="bg-zinc-500/[0.15]">
+    <Card className="bg-zinc-500/[0.15] cursor-pointer" >
       <CardHeader>
         <div className="flex justify-between items-center w-full">
           <CardTitle>{project.name}</CardTitle>
