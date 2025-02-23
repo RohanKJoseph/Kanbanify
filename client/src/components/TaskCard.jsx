@@ -121,7 +121,6 @@ const TaskCard = ({ card, projectId }) => {
                       <span className="text-lg">Comments</span>
                     </div>
                     <div className="space-y-2">
-                      {console.log("card:", card, ",", cardDetails)}
                       {cardDetails?.card?.comments?.map((comment) => (
                         <div key={comment.id} className="pl-5">
                           <div className="flex items-center gap-2 text-sm text-gray-400"></div>
