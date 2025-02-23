@@ -30,9 +30,21 @@ const updateCardFromDB = async (cardId, title, description, typeId) => {
   });
 };
 
+const assignUserToCard = async (cardId, userId) => {
+  return await prisma.card.update({
+    where: { id: cardId },
+    data: {
+      assigned: {
+        connect: { id: userId }
+      }
+    },
+  });
+};
+
 module.exports = {
   getCardFromDB,
   addCardToDB,
   deleteCardFromDB,
   updateCardFromDB,
+  assignUserToCard,
 };

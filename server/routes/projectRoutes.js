@@ -37,4 +37,7 @@ router.get("/:projectId/cards/:cardId/comments", commentController.getComments);
 router.post("/:projectId/cards/:cardId/comments", commentController.createComment);
 router.delete("/:projectId/cards/:cardId/comments/:commentId", commentController.deleteComment);
 
+//assign people routes
+router.post("/:projectId/cards/:cardId/assign", projectController.assignUser);
+
 module.exports = router;
