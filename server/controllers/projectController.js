@@ -5,6 +5,7 @@ const {
   deleteProjectFromDB,
   updateProjectInDB,
 } = require("../db/projectDB");
+const { getCardFromDB, assignUserToCard } = require("../db/cardDB");
 const { getUserFromDB } = require("../db/userDB");
 
 class ProjectController {
@@ -85,6 +86,11 @@ class ProjectController {
           name: project.user.name,
           profileUrl: project.user.profileUrl,
         },
+        members: project.projectMembers.map(member => ({
+          id: member.user.id,
+          name: member.user.name,
+          profileUrl: member.user.profileUrl
+        }))
       };
 
       res.status(200).json({
@@ -146,17 +152,35 @@ class ProjectController {
   assignUser = async (req, res) => {
     try {
       const cardId = req.params.cardId;
+      const projectId = req.params.projectId;
       const email = req.body.email;
+
+      const project = await getProjectFromDBById(projectId);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      const card = await getCardFromDB(cardId);
+      if (!card) {
+        return res.status(404).json({ error: "Card not found" });
+      }
+
       const user = await getUserFromDB({ email });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
 
-      const card = await assignUserToCard(cardId, user.id);
+      const isMember = project.projectMembers.some(member => member.userId === user.id);
+      if (!isMember) {
+        return res.status(403).json({ error: "User is not a member of this project" });
+      }
 
-      res
-        .status(200)
-        .json({ message: "User assigned to card successfully", card });
+      const updatedCard = await assignUserToCard(cardId, user.id);
+
+      res.status(200).json({ 
+        message: "User assigned to card successfully", 
+        card: updatedCard 
+      });
     } catch (error) {
       res
         .status(500)
