@@ -68,9 +68,7 @@ const ProjectCard = ({ project, setProjects, projects }) => {
   const handleDeleteProject = async () => {
     try {
       setProjects(projects.filter((p) => p.id !== project.id));
-      const response = await axiosPrivate.delete(
-        `/project/${project.id}`
-      );
+      const response = await axiosPrivate.delete(`/project/${project.id}`);
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
@@ -83,7 +81,7 @@ const ProjectCard = ({ project, setProjects, projects }) => {
   };
 
   return (
-    <Card>
+    <Card className="bg-zinc-500/[0.15]">
       <CardHeader>
         <div className="flex justify-between items-center w-full">
           <CardTitle>{project.name}</CardTitle>

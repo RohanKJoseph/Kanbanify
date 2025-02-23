@@ -71,7 +71,7 @@ const DashBoard = () => {
         }}
       >
         <DialogTrigger asChild>
-          <Card className="border-dashed border-2 border-[#afafaf] flex justify-center items-center bg-[#3d7afd]/[0.10] cursor-pointer">
+          <Card className="border-dashed border-2 border-[#afafaf] flex justify-center items-center bg-zinc-500/[0.13] cursor-pointer">
             <CardContent>
               <h1 className="opacity-100">Create New Project</h1>
             </CardContent>
