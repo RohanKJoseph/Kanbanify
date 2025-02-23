@@ -1,5 +1,18 @@
 const prisma = require("../utils/prisma");
 
+const getCardFromDB = async (cardId) => {
+  return await prisma.card.findUnique({
+    where: { id: cardId },
+    select: {
+      title: true,
+      description: true,
+      comments: true,
+      type: true,
+      assigned: true,
+    },
+  });
+};
+
 const addCardToDB = async (title, description, typeId, projectId) => {
   return await prisma.card.create({
     data: { title, description, typeId, projectId },
@@ -17,4 +30,9 @@ const updateCardFromDB = async (cardId, title, description, typeId) => {
   });
 };
 
-module.exports = { addCardToDB, deleteCardFromDB, updateCardFromDB };
+module.exports = {
+  getCardFromDB,
+  addCardToDB,
+  deleteCardFromDB,
+  updateCardFromDB,
+};

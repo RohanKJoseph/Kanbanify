@@ -20,6 +20,7 @@ router.delete("/:projectId/types/:typeId", typeController.deleteType);
 router.put("/:projectId/types/:typeId", typeController.updateType);
 
 // Card routes
+router.get("/:projectId/cards/:cardId", cardController.getCard);
 router.post("/:projectId/cards/create", cardController.createCard);
 router.delete("/:projectId/cards/:cardId", cardController.deleteCard);
 router.put("/:projectId/cards/:cardId", cardController.updateCard);
