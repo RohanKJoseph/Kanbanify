@@ -7,6 +7,7 @@ import DashBoard from "./pages/DashBoard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "@/components/ui/sonner";
 import Project from "./pages/Project";
+import Invites from "./pages/Invites";
 
 function App() {
   return (
@@ -21,6 +22,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DashBoard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/invites"
+              element={
+                <ProtectedRoute>
+                  <Invites />
                 </ProtectedRoute>
               }
             />
