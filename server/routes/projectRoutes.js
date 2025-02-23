@@ -5,6 +5,7 @@ const typeController = require("../controllers/typeController");
 const { authenticateJWT } = require("../middleware/auth");
 const cardController = require("../controllers/cardController");
 const inviteController = require("../controllers/inviteController");
+const commentController = require("../controllers/commentController");
 
 router.use(authenticateJWT);
 // Project routes
@@ -30,5 +31,10 @@ router.post("/:projectId/invite", inviteController.inviteUser);
 router.put("/:projectId/accept-invite", inviteController.acceptInvite);        
 router.post("/:projectId/decline-invite", inviteController.declineInvite);
 router.get("/invites", inviteController.getInvites);
+
+//comment routes
+router.get("/:projectId/cards/:cardId/comments", commentController.getComments);
+router.post("/:projectId/cards/:cardId/comments", commentController.createComment);
+router.delete("/:projectId/cards/:cardId/comments/:commentId", commentController.deleteComment);
 
 module.exports = router;
