@@ -32,7 +32,7 @@ const Sidebar = ({ onHoverChange }) => {
           <SquareKanban size="35" />
           {isHovered && <p className="text-[18px]">Projects</p>}
         </a>
-        <a href="/invites" className="flex items-center gap-3 mb-[55vh]">
+        <a href="/invites" className="flex items-center gap-3 mb-[45vh]">
           <Users size="35" />
           {isHovered && <p className="text-[18px]">Invites</p>}
         </a>
