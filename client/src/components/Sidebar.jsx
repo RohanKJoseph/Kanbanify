@@ -13,7 +13,7 @@ const Sidebar = ({ onHoverChange }) => {
 
   return (
     <div
-      className="pt-5 flex flex-col justify-start items-center h-screen bg-black border-r-2 border-zinc-400 transition-all duration-300 w-full"
+      className={`pt-5 flex min-w-14 flex-col justify-start items-center h-screen bg-black border-r-2 border-zinc-400 transition-all duration-300 w-full ${isHovered && "min-w-40"}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
