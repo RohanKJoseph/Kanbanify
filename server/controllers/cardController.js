@@ -1,8 +1,10 @@
+const {addCardToDB, deleteCardFromDB, updateCardFromDB} = require("../db/cardDB")
+
 class CardController {
   createCard = async (req, res) => {
-    const { name, description, typeId } = req.body;
+    const { title, description, typeId } = req.body;
     const projectId = req.params.projectId;
-    const card = await addCardToDB(name, description, typeId, projectId);
+    const card = await addCardToDB(title, description, typeId, projectId);
     res.status(200).json({ message: "Card created successfully", card });
   }
 
@@ -14,8 +16,8 @@ class CardController {
 
   updateCard = async (req, res) => {
     const cardId = req.params.cardId;
-    const { name, description, typeId } = req.body;
-    const card = await updateCardFromDB(cardId, name, description, typeId);
+    const { title, description, typeId } = req.body;
+    const card = await updateCardFromDB(cardId, title, description, typeId);
     res.status(200).json({ message: "Card updated successfully", card });
   }
 }
