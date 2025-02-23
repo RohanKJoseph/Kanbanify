@@ -1,19 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
   Card,
-  CardHeader,
-  CardFooter,
   CardTitle,
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -25,13 +16,23 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Plus, Trash2, MessageSquare } from "lucide-react";
-import { API_BASE_URL } from "@/lib/env";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const TaskCard = ({ card, projectId }) => {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [cardDetails, setCardDetails] = useState(null);
   const { axiosPrivate } = useAuth();
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+  const [projectMembers, setProjectMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState("");
+  const [isAssigningMember, setIsAssigningMember] = useState(false);
 
   useEffect(() => {
     const fetchCardDetails = async () => {
@@ -53,6 +54,25 @@ const TaskCard = ({ card, projectId }) => {
 
     fetchCardDetails();
   }, [isUpdateDialogOpen, projectId, card.id, axiosPrivate]);
+
+  useEffect(() => {
+    const fetchProjectMembers = async () => {
+      if (isAssignDialogOpen) {
+        try {
+          const response = await axiosPrivate.get(`/project/${projectId}/members`);
+          if (response.data.error) {
+            toast.error(response.data.error);
+          } else {
+            setProjectMembers(response.data.members);
+          }
+        } catch (error) {
+          toast.error("Error fetching project members");
+        }
+      }
+    };
+
+    fetchProjectMembers();
+  }, [isAssignDialogOpen, projectId, axiosPrivate]);
 
   const handleDeleteTask = async () => {
     try {
@@ -84,10 +104,37 @@ const TaskCard = ({ card, projectId }) => {
     }
   };
 
+  const handleAssignMember = async () => {
+    setIsAssigningMember(true);
+    try {
+      const response = await axiosPrivate.post(
+        `/project/${projectId}/cards/${card.id}/assign`,
+        { email: selectedMember?.email }
+      );
+      if (response.data.error) {
+        toast.error(response.data.error);
+      } else {
+        toast.success("Member assigned successfully");
+        // Fetch updated card details
+        const cardResponse = await axiosPrivate.get(
+          `/project/${projectId}/cards/${card.id}`
+        );
+        if (!cardResponse.data.error) {
+          setCardDetails(cardResponse.data);
+        }
+        setIsAssignDialogOpen(false);
+      }
+    } catch (error) {
+      toast.error("Error assigning member");
+    } finally {
+      setIsAssigningMember(false);
+    }
+  };
+
   return (
     <>
       <Card
-        className={`cursor-pointer bg-[#2E2D2D]`}
+        className={`cursor-pointer bg-zinc-800`}
         onClick={() => setIsUpdateDialogOpen(true)}
       >
         <CardContent className="p-0">
@@ -108,7 +155,9 @@ const TaskCard = ({ card, projectId }) => {
       </Card>
 
       <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>
-        <DialogContent className={"bg-[#2E2D2D] overflow-hidden min-w-[50vw] min-h-[60vh]"}>
+        <DialogContent
+          className={" overflow-hidden min-w-[70vw] min-h-[80vh]"}
+        >
           <DialogHeader>
             <DialogTitle className={"text-left"}>{card.title}</DialogTitle>
             <DialogDescription>
@@ -123,7 +172,7 @@ const TaskCard = ({ card, projectId }) => {
                     <div className="space-y-2">
                       {cardDetails?.card?.comments?.map((comment) => (
                         <div key={comment.id} className="pl-5">
-                          <div className="flex items-center gap-2 text-sm text-gray-400"></div>
+                          <div className="flex items-center gap-2 text-sm text-zinc-400"></div>
                           <p className="mt-1 text-white">{comment.content}</p>
                         </div>
                       ))}
@@ -136,19 +185,44 @@ const TaskCard = ({ card, projectId }) => {
                   </div>
                   <div className="w-full">
                     <div className="flex flex-col justify-center items-start pl-5 w-full">
-                      <div className="flex items-center ml-2 gap-5 text-[18px] ">
-                        Assigned
-                        <Plus size={18}/>
+                      <div className="flex items-center justify-between w-full pr-5 mb-3">
+                        <span className="text-lg font-semibold">
+                          Assigned Members
+                        </span>
+                        <button 
+                          className="hover:bg-zinc-700 p-1.5 rounded-full transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsAssignDialogOpen(true);
+                          }}
+                        >
+                          <Plus size={18} />
+                        </button>
                       </div>
-                      <div className="bg-white h-[1px] w-1/2 mt-[1px]" />
+                      <div className="bg-zinc-600 h-[1px] w-full opacity-30" />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 mt-4 pl-5">
                       {cardDetails?.card?.assigned?.map((assigned) => (
-                        <div key={assigned.id} className="pl-5">
-                          <div className="flex items-center gap-2 text-sm text-gray-400"></div>
-                          <p className="mt-1 text-white">{assigned.name}</p>
+                        <div
+                          key={assigned.id}
+                          className="flex items-center gap-3 pl-2 py-2 hover:bg-zinc-700/50 rounded-lg transition-colors"
+                        >
+                          <div className="w-8 h-8 rounded-full  flex items-center justify-center">
+                            <img
+                              src={assigned.profileUrl}
+                              alt={assigned.name}
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          </div>
+                          <p className="text-white text-base">{assigned.name}</p>
                         </div>
                       ))}
+                      {(!cardDetails?.card?.assigned ||
+                        cardDetails.card.assigned.length === 0) && (
+                        <p className="text-zinc-400 text-sm pl-5">
+                          No members assigned
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -174,6 +248,46 @@ const TaskCard = ({ card, projectId }) => {
             <LoadingButton
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </LoadingButton>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isAssignDialogOpen}
+        onOpenChange={() => {
+          setSelectedMember(null);
+          setIsAssignDialogOpen(!isAssignDialogOpen);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Assign Member</DialogTitle>
+            <DialogDescription>
+              Select a member to assign to this task
+            </DialogDescription>
+          </DialogHeader>
+          <Select onValueChange={setSelectedMember} value={selectedMember}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a member" />
+            </SelectTrigger>
+            <SelectContent>
+              {projectMembers.map((member) => (
+                <SelectItem key={member.id} value={member}>
+                  {member.email}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="flex justify-end gap-4 mt-4">
+            <LoadingButton onClick={handleAssignMember} loading={isAssigningMember}>
+              Assign
+            </LoadingButton>
+            <LoadingButton
+              variant="outline"
+              onClick={() => setIsAssignDialogOpen(false)}
             >
               Cancel
             </LoadingButton>
