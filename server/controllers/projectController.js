@@ -4,6 +4,7 @@ const {
   getProjectFromDBById,
   deleteProjectFromDB,
   updateProjectInDB,
+  getProjectMembersFromDB,
 } = require("../db/projectDB");
 const { getCardFromDB, assignUserToCard } = require("../db/cardDB");
 const { getUserFromDB } = require("../db/userDB");
@@ -86,11 +87,11 @@ class ProjectController {
           name: project.user.name,
           profileUrl: project.user.profileUrl,
         },
-        members: project.projectMembers.map(member => ({
+        members: project.projectMembers.map((member) => ({
           id: member.user.id,
           name: member.user.name,
-          profileUrl: member.user.profileUrl
-        }))
+          profileUrl: member.user.profileUrl,
+        })),
       };
 
       res.status(200).json({
@@ -159,7 +160,7 @@ class ProjectController {
       if (!project) {
         return res.status(404).json({ error: "Project not found" });
       }
-      
+
       const card = await getCardFromDB(cardId);
       if (!card) {
         return res.status(404).json({ error: "Card not found" });
@@ -170,21 +171,46 @@ class ProjectController {
         return res.status(404).json({ error: "User not found" });
       }
 
-      const isMember = project.projectMembers.some(member => member.userId === user.id);
+      const isMember = project.projectMembers.some(
+        (member) => member.userId === user.id
+      );
       if (!isMember) {
-        return res.status(403).json({ error: "User is not a member of this project" });
+        return res
+          .status(403)
+          .json({ error: "User is not a member of this project" });
       }
 
       const updatedCard = await assignUserToCard(cardId, user.id);
 
-      res.status(200).json({ 
-        message: "User assigned to card successfully", 
-        card: updatedCard 
+      res.status(200).json({
+        message: "User assigned to card successfully",
+        card: updatedCard,
       });
     } catch (error) {
       res
         .status(500)
         .json({ error: `Error assigning user to card: ${error.message}` });
+    }
+  };
+
+  getProjectMembers = async (req, res) => {
+    try {
+      const projectId = req.params.projectId;
+      const members = await getProjectMembersFromDB(projectId);
+      const responseData = members.map((member) => ({
+        id: member.user.id,
+        email: member.user.email,
+      }));
+      res
+        .status(200)
+        .json({
+          message: "Members fetched successfully",
+          members: responseData,
+        });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: `Error getting project members: ${error.message}` });
     }
   };
 }
