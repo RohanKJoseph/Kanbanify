@@ -3,8 +3,9 @@ const {
   getProjectsFromDB,
   getProjectFromDBById,
   deleteProjectFromDB,
-  updateProjectInDB
+  updateProjectInDB,
 } = require("../db/projectDB");
+const { getUserFromDB } = require("../db/userDB");
 
 class ProjectController {
   createProject = async (req, res) => {
@@ -17,7 +18,9 @@ class ProjectController {
       }
       const userId = req.user.id;
       const project = await addProjectToDB(name, description, userId);
-      res.status(200).json({ message: "Project created successfully", project });
+      res
+        .status(200)
+        .json({ message: "Project created successfully", project });
     } catch (error) {
       res
         .status(500)
@@ -57,7 +60,7 @@ class ProjectController {
     try {
       const projectId = req.params.projectId;
       const project = await getProjectFromDBById(projectId);
-      
+
       const categorizedCards = {};
       project.types.forEach((type) => {
         categorizedCards[type.id] = {
@@ -66,7 +69,7 @@ class ProjectController {
             id: type.id,
             name: type.name,
             position: type.position,
-          }
+          },
         };
       });
 
@@ -84,12 +87,10 @@ class ProjectController {
         },
       };
 
-      res
-        .status(200)
-        .json({
-          message: "Project fetched successfully",
-          project: responseData,
-        });
+      res.status(200).json({
+        message: "Project fetched successfully",
+        project: responseData,
+      });
     } catch (error) {
       res
         .status(500)
@@ -102,10 +103,19 @@ class ProjectController {
       const projectId = req.params.projectId;
       const { name, description } = req.body;
       const userId = req.user.id;
-      const project = await updateProjectInDB(projectId, name, description, userId);
-      res.status(200).json({ message: "Project updated successfully", project });
+      const project = await updateProjectInDB(
+        projectId,
+        name,
+        description,
+        userId
+      );
+      res
+        .status(200)
+        .json({ message: "Project updated successfully", project });
     } catch (error) {
-      res.status(500).json({ error: `Error updating project: ${error.message}` });
+      res
+        .status(500)
+        .json({ error: `Error updating project: ${error.message}` });
     }
   };
 
@@ -130,6 +140,27 @@ class ProjectController {
       res
         .status(500)
         .json({ error: `Error deleting project: ${error.message}` });
+    }
+  };
+
+  assignUser = async (req, res) => {
+    try {
+      const cardId = req.params.cardId;
+      const email = req.body.email;
+      const user = await getUserFromDB({ email });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const card = await assignUserToCard(cardId, user.id);
+
+      res
+        .status(200)
+        .json({ message: "User assigned to card successfully", card });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: `Error assigning user to card: ${error.message}` });
     }
   };
 }
