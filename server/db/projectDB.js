@@ -30,10 +30,28 @@ const addProjectToDB = async (name, description, userId) => {
 };
 
 const getProjectsFromDB = async (userId) => {
-  return await prisma.project.findMany({
+  const ownedProjects = await prisma.project.findMany({
     where: { ownerId: userId },
     include: { user: true },
   });
+
+  const memberProjects = await prisma.project.findMany({
+    where: {
+      projectMembers: {
+        some: {
+          userId: userId,
+        },
+      },
+    },
+    include: { user: true },
+  });
+
+  const allProjects = [...ownedProjects, ...memberProjects];
+  const uniqueProjects = Array.from(
+    new Set(allProjects.map((project) => project.id))
+  ).map((id) => allProjects.find((project) => project.id === id));
+
+  return uniqueProjects;
 };
 
 const getProjectFromDBById = async (projectId) => {
@@ -89,5 +107,5 @@ module.exports = {
   deleteProjectFromDB,
   addMemberToProject,
   updateProjectInDB,
-  getProjectMembersFromDB
+  getProjectMembersFromDB,
 };
