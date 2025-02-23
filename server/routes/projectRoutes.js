@@ -11,6 +11,7 @@ router.use(authenticateJWT);
 // Project routes
 router.get("/", projectController.getProjects);
 router.post("/create", projectController.createProject);
+router.get("/invites", inviteController.getInvites);
 router.get("/:projectId", projectController.getProjectById);
 router.delete("/:projectId", projectController.deleteProject);
 router.put("/:projectId", projectController.updateProject);
@@ -31,7 +32,6 @@ router.put("/:projectId/cards/:cardId", cardController.updateCard);
 router.post("/:projectId/invite", inviteController.inviteUser);     
 router.put("/:projectId/accept-invite", inviteController.acceptInvite);        
 router.post("/:projectId/decline-invite", inviteController.declineInvite);
-router.get("/invites", inviteController.getInvites);
 
 //comment routes
 router.get("/:projectId/cards/:cardId/comments", commentController.getComments);
