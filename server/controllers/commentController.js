@@ -17,14 +17,22 @@ class CommentController {
     const { content } = req.body;
     const cardId = req.params.cardId;
     const userId = req.user.id;
-    const comment = await createCommentToDB(content, cardId, userId);
+   try {
+     const comment = await createCommentToDB(content, cardId, userId);
     res.status(200).json({ message: "Comment created successfully", comment });
+   }catch (error) {
+     res.status(500).json({ message: "Error creating comment", error: error.message });
+   }
   };
 
   deleteComment = async (req, res) => {
     const commentId = req.params.commentId;
-    const comment = await deleteCommentFromDB(commentId);
+    try {
+      const comment = await deleteCommentFromDB(commentId);
     res.status(200).json({ message: "Comment deleted successfully", comment });
+    }catch (error) {
+      res.status(500).json({ message: "Error deleting comment", error: error.message });
+    }
   };
 }
 
